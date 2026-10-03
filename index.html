@@ -8,31 +8,34 @@
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-*{
+* {
     box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 html, body {
     width: 100%;
     height: 100%;
-    margin: 0;
-    padding: 0;
     overflow: hidden;
-    background: #000;
+    background: #1c2a22;
     font-family: 'Montserrat', sans-serif;
     color: #fff8e9;
 }
 
-/* Стартовый оверлей */
+/* Стартовая заставка с кнопкой */
 .start-overlay {
     position: fixed;
     inset: 0;
-    z-index: 999;
-    background: rgba(15, 27, 22, 0.92);
-    backdrop-filter: blur(10px);
+    z-index: 9999;
+    background: rgba(18, 28, 23, 0.97);
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 24px;
+    padding: 20px;
+    text-align: center;
     transition: opacity 0.5s ease, visibility 0.5s ease;
 }
 
@@ -42,25 +45,29 @@ html, body {
     pointer-events: none;
 }
 
-/* Круглая кнопка по центру без текста */
-.start-btn {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #f4d28f, #e1b463);
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(244, 210, 143, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    padding: 0;
+.start-title {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: clamp(28px, 6vw, 42px);
+    color: #f4d28f;
 }
 
-.start-btn:hover {
-    transform: scale(1.08);
-    box-shadow: 0 12px 35px rgba(0,0,0,0.6), 0 0 30px rgba(244, 210, 143, 0.6);
+/* Яркая и крупная кнопка запуска */
+.start-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 18px 36px;
+    font-size: 19px;
+    font-weight: 700;
+    color: #1c2a22;
+    background: linear-gradient(135deg, #f4d28f, #e1b463);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(244, 210, 143, 0.5);
+    transition: transform 0.2s;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .start-btn:active {
@@ -68,17 +75,16 @@ html, body {
 }
 
 .start-btn svg {
-    width: 32px;
-    height: 32px;
+    width: 26px;
+    height: 26px;
     fill: #1c2a22;
-    margin-left: 4px;
 }
 
+/* Основной экран */
 .photo-scene {
     position: relative;
     width: 100vw;
     height: 100vh;
-    min-height: 100svh;
     overflow: hidden;
     background: #25382e;
 }
@@ -87,40 +93,26 @@ html, body {
     position: absolute;
     inset: -24px;
     z-index: 0;
-    background-image: url('Снимок%20экрана%2003.10.2026%20211608.png');
+    background-image: url('bg-photo.png');
     background-position: center;
     background-size: cover;
     filter: blur(22px) brightness(.58) saturate(1.1);
-    transform: scale(1.04);
 }
 
 .photo-scene__image {
     position: absolute;
     inset: 0;
     z-index: 1;
-    background-image: url('Снимок%20экрана%2003.10.2026%20211608.png');
+    background-image: url('bg-photo.png');
     background-position: center;
     background-size: contain;
     background-repeat: no-repeat;
-    animation: photo-appear 1.5s ease both;
-}
-
-.photo-scene__shade {
-    position: absolute;
-    inset: 0;
-    z-index: 2;
-    background: linear-gradient(90deg, rgba(15,27,22,.12), rgba(15,27,22,.05) 48%, rgba(15,27,22,.22));
-    pointer-events: none;
 }
 
 .invitation-slides {
     position: absolute;
     inset: 0;
     z-index: 3;
-}
-
-.invitation-audio {
-    display: none;
 }
 
 .invitation-slide {
@@ -139,11 +131,9 @@ html, body {
 .invitation-panel {
     width: min(47vw, 650px);
     max-height: 88vh;
-    min-height: min(82vh, 720px);
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: auto;
     padding: clamp(26px, 4vw, 54px);
     border: 1px solid rgba(241, 211, 159, .44);
     border-radius: 14px;
@@ -153,38 +143,30 @@ html, body {
     text-align: center;
 }
 
-.invitation-slide.is-active .invitation-panel {
-    animation: panel-arrive .85s cubic-bezier(.2, .8, .2, 1) both;
-}
-
 .invitation-copy {
-    margin: 0;
     font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: clamp(34px, 4.4vw, 64px);
-    line-height: 1.12;
-    font-weight: 600;
+    font-size: clamp(32px, 4.4vw, 60px);
+    line-height: 1.15;
     color: #fff8e9;
-    text-shadow: 0 3px 14px rgba(0, 0, 0, .24);
 }
 
 .invitation-copy--details {
     font-family: 'Montserrat', sans-serif;
     font-size: clamp(15px, 1.7vw, 22px);
     line-height: 1.45;
-    font-weight: 500;
 }
 
 .stagger {
     display: block;
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(20px);
 }
 
 .invitation-slide.is-active .stagger {
-    animation: text-arrive .8s cubic-bezier(.2, .8, .2, 1) var(--delay, .18s) both;
+    animation: text-arrive .8s ease var(--delay, .18s) forwards;
 }
 
-.stagger--accent, .detail-label {
+.stagger--accent {
     color: #f4d28f;
 }
 
@@ -199,83 +181,57 @@ html, body {
 .detail-line svg {
     width: 22px;
     height: 22px;
-    flex: 0 0 22px;
+    flex-shrink: 0;
     margin-top: 2px;
     fill: none;
     stroke: #f4d28f;
     stroke-width: 1.7;
-    stroke-linecap: round;
-    stroke-linejoin: round;
 }
 
 .hosts-line {
-    margin-top: 22px !important;
+    margin-top: 20px !important;
     font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: clamp(27px, 3.5vw, 44px);
+    font-size: clamp(26px, 3.5vw, 42px);
     color: #f4d28f;
 }
 
-@keyframes photo-appear {
-    from { opacity: .55; }
-    to { opacity: 1; }
-}
-
-@keyframes panel-arrive {
-    from { opacity: 0; transform: translateY(18px) scale(.985); }
-    to { opacity: 1; transform: translateY(0) scale(1); }
-}
-
 @keyframes text-arrive {
-    from { opacity: 0; transform: translateY(24px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
 @media(max-width: 700px){
-    .photo-scene {
-        height: 100dvh;
-        min-height: 100svh;
-    }
-
     .photo-scene__image {
-        background-position: 27% center;
+        background-position: center top;
         background-size: cover;
-    }
-
-    .photo-scene__shade {
-        background: linear-gradient(180deg, rgba(15,27,22,.04) 20%, rgba(15,27,22,.16) 58%, rgba(15,27,22,.38) 100%);
     }
 
     .invitation-slide {
         align-items: flex-end;
         justify-content: center;
-        padding: 0 0 max(16px, env(safe-area-inset-bottom));
+        padding: 0;
     }
 
     .invitation-panel {
         width: 100%;
-        max-height: 70vh;
-        min-height: 0;
-        display: block;
-        overflow: visible;
-        padding: 34px 18px 18px;
-        border: 0;
+        max-height: 65vh;
         border-radius: 0;
-        background: linear-gradient(180deg, rgba(28,42,34,0), rgba(28,42,34,.88) 16%, rgba(28,42,34,.94));
+        background: linear-gradient(180deg, rgba(28,42,34,0), rgba(28,42,34,.95) 20%);
         box-shadow: none;
         backdrop-filter: none;
+        border: none;
+        padding: 30px 20px 30px;
     }
 
     .invitation-copy {
-        font-size: clamp(22px, 5.8vw, 29px);
-        line-height: 1.08;
+        font-size: clamp(22px, 5.8vw, 28px);
     }
 
     .invitation-copy--details {
-        font-size: clamp(15px, 4.4vw, 18px);
+        font-size: clamp(14px, 4.2vw, 17px);
     }
 
     .hosts-line {
-        font-size: clamp(20px, 5.5vw, 26px);
+        font-size: clamp(20px, 5.2vw, 25px);
     }
 }
 </style>
@@ -284,19 +240,18 @@ html, body {
 <body>
 
 <div class="start-overlay" id="startOverlay">
-    <button class="start-btn" id="startBtn" aria-label="Воспроизвести">
-        <svg viewBox="0 0 24 24">
-            <path d="M8 5v14l11-7z"/>
-        </svg>
+    <h1 class="start-title">Жоламандын тоюна чакыруу</h1>
+    <button class="start-btn" id="startBtn">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+        <span>Чакырууну ачуу</span>
     </button>
 </div>
 
 <main class="photo-scene">
     <div class="photo-scene__ambient" aria-hidden="true"></div>
     <div class="photo-scene__image" aria-hidden="true"></div>
-    <div class="photo-scene__shade" aria-hidden="true"></div>
 
-    <audio class="invitation-audio" id="invitationAudio" preload="auto" src="invitation-audio.mp3"></audio>
+    <audio id="invitationAudio" preload="auto" src="invitation-audio.mp3"></audio>
 
     <div class="invitation-slides">
         <section class="invitation-slide is-active">
@@ -335,7 +290,7 @@ html, body {
                 <div class="invitation-copy invitation-copy--details">
                     <div class="stagger stagger--accent" style="--delay:.15s">Дареги:</div>
                     <div class="detail-line stagger" style="--delay:.42s">
-                        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
+                        <svg viewBox="0 0 24 24"><path d="M20 10c0 5-8 12-8 12S4 15 4 10a8 8 0 1 1 16 0Z"></path><circle cx="12" cy="10" r="2.5"></circle></svg>
                         <span>Кара-Суу району,<br>Жылкелди айылы,<br>Алимбеков көчөсү,<br>үй номери 87.</span>
                     </div>
                 </div>
@@ -387,10 +342,12 @@ function syncAudio() {
 
 startBtn.addEventListener('click', () => {
     startOverlay.classList.add('is-hidden');
+    
     invitationAudio.play().then(() => {
         invitationAudio.addEventListener('timeupdate', syncAudio);
     }).catch(err => {
-        console.error("Ошибка воспроизведения аудио:", err);
+        alert("Ошибка аудиофайла. Проверьте, загружен ли invitation-audio.mp3 на GitHub.");
+        console.error(err);
     });
 });
 
