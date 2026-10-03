@@ -23,7 +23,7 @@ html, body {
     color: #fff8e9;
 }
 
-/* Стартовая заставка */
+/* Стартовая заставка с кнопкой */
 .start-overlay {
     position: fixed;
     inset: 0;
@@ -79,7 +79,7 @@ html, body {
     fill: #1c2a22;
 }
 
-/* Основная сцена */
+/* Главная сцена */
 .photo-scene {
     position: relative;
     width: 100vw;
@@ -88,26 +88,28 @@ html, body {
     background: #1c2a22;
 }
 
-/* Размытый задний фон, чтобы закрыть пустые поля */
-.photo-scene__ambient {
-    position: absolute;
-    inset: -20px;
-    z-index: 0;
-    background-image: url('bg-photo.png');
-    background-position: center;
-    background-size: cover;
-    filter: blur(25px) brightness(.45);
-}
-
-/* Четкое фото мальчика */
+/* Фото мальчика */
 .photo-scene__image {
     position: absolute;
     inset: 0;
     z-index: 1;
     background-image: url('bg-photo.png');
-    background-position: center center;
-    background-size: contain;
+    background-position: center 15%;
+    background-size: cover;
     background-repeat: no-repeat;
+}
+
+/* Затемнение поверх фото */
+.photo-scene__overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    background: linear-gradient(
+        180deg, 
+        rgba(18, 28, 23, 0.15) 0%, 
+        rgba(18, 28, 23, 0.45) 45%, 
+        rgba(18, 28, 23, 0.88) 100%
+    );
 }
 
 .invitation-slides {
@@ -120,47 +122,46 @@ html, body {
     position: absolute;
     inset: 0;
     display: none;
-    align-items: flex-start;
-    justify-content: flex-end;
-    padding: clamp(18px, 5vw, 72px);
+    align-items: flex-end;
+    justify-content: center;
+    padding: 20px;
 }
 
 .invitation-slide.is-active {
     display: flex;
 }
 
+/* Поднятая панель с текстом */
 .invitation-panel {
-    width: min(47vw, 650px);
-    max-height: 88vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: clamp(26px, 4vw, 54px);
-    border: 1px solid rgba(241, 211, 159, .44);
-    border-radius: 14px;
-    background: rgba(28, 42, 34, .91);
-    box-shadow: 0 24px 70px rgba(9, 18, 13, .3);
-    backdrop-filter: blur(8px);
+    width: min(90vw, 600px);
+    margin-bottom: clamp(60px, 12vh, 120px); /* Приподняли блок с текстом выше */
+    padding: clamp(18px, 4vw, 30px);
+    border: 1px solid rgba(241, 211, 159, .35);
+    border-radius: 16px;
+    background: rgba(24, 36, 29, 0.78);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     text-align: center;
 }
 
 .invitation-copy {
     font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: clamp(32px, 4.4vw, 60px);
-    line-height: 1.15;
+    font-size: clamp(22px, 5.2vw, 38px);
+    line-height: 1.25;
     color: #fff8e9;
 }
 
 .invitation-copy--details {
     font-family: 'Montserrat', sans-serif;
-    font-size: clamp(15px, 1.7vw, 22px);
+    font-size: clamp(14px, 3.6vw, 17px);
     line-height: 1.45;
 }
 
 .stagger {
     display: block;
     opacity: 0;
-    transform: translateY(20px);
+    transform: translateY(15px);
 }
 
 .invitation-slide.is-active .stagger {
@@ -176,12 +177,12 @@ html, body {
     align-items: flex-start;
     justify-content: center;
     gap: 10px;
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
 .detail-line svg {
-    width: 22px;
-    height: 22px;
+    width: 20px;
+    height: 20px;
     flex-shrink: 0;
     margin-top: 2px;
     fill: none;
@@ -190,9 +191,9 @@ html, body {
 }
 
 .hosts-line {
-    margin-top: 20px !important;
+    margin-top: 12px !important;
     font-family: 'Cormorant Garamond', Georgia, serif;
-    font-size: clamp(26px, 3.5vw, 42px);
+    font-size: clamp(22px, 4.8vw, 32px);
     color: #f4d28f;
 }
 
@@ -200,42 +201,12 @@ html, body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Настройки специально для мобильных телефонов */
-@media(max-width: 700px){
-    .photo-scene__image {
-        /* Картинка встает по центру сверху и помещается целиком без обрезки */
-        background-position: center 5%;
-        background-size: contain;
-        height: 65vh; /* Фото занимает верхнюю часть экрана */
-    }
-
-    .invitation-slide {
-        align-items: flex-end;
-        justify-content: center;
-        padding: 0;
-    }
-
+/* Адаптивность под мобильные устройства */
+@media(max-width: 600px){
     .invitation-panel {
-        width: 100%;
-        max-height: 45vh;
-        border-radius: 0;
-        background: linear-gradient(180deg, rgba(28,42,34,0) 0%, rgba(28,42,34,0.92) 20%, rgba(28,42,34,0.98) 100%);
-        box-shadow: none;
-        backdrop-filter: none;
-        border: none;
-        padding: 30px 20px 25px;
-    }
-
-    .invitation-copy {
-        font-size: clamp(20px, 5.5vw, 26px);
-    }
-
-    .invitation-copy--details {
-        font-size: clamp(13px, 4vw, 16px);
-    }
-
-    .hosts-line {
-        font-size: clamp(19px, 5vw, 24px);
+        width: 92%;
+        padding: 20px 15px;
+        margin-bottom: clamp(70px, 14vh, 110px); /* Гарантированный отступ от низа на смартфонах */
     }
 }
 </style>
@@ -252,8 +223,8 @@ html, body {
 </div>
 
 <main class="photo-scene">
-    <div class="photo-scene__ambient" aria-hidden="true"></div>
     <div class="photo-scene__image" aria-hidden="true"></div>
+    <div class="photo-scene__overlay" aria-hidden="true"></div>
 
     <audio id="invitationAudio" preload="auto" src="invitation-audio.mp3"></audio>
 
