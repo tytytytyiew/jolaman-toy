@@ -1050,6 +1050,33 @@ body{
     display:none;
 }
 
+.audio-fallback{
+    position:absolute;
+    z-index:5;
+    left:max(14px,env(safe-area-inset-left));
+    bottom:max(14px,env(safe-area-inset-bottom));
+    display:none;
+    width:40px;
+    height:40px;
+    padding:0;
+    place-items:center;
+    border:1px solid rgba(241,211,159,.55);
+    border-radius:50%;
+    background:rgba(28,42,34,.72);
+    box-shadow:0 4px 14px rgba(9,18,13,.24);
+    cursor:pointer;
+}
+
+.audio-fallback svg{
+    width:16px;
+    height:16px;
+    fill:#f4d28f;
+}
+
+.photo-scene.audio-blocked .audio-fallback{
+    display:grid;
+}
+
 .invitation-slide{
     position:absolute;
     inset:0;
@@ -1254,6 +1281,9 @@ body{
     <div class="photo-scene__shade" aria-hidden="true"></div>
 
     <audio class="invitation-audio" id="invitationAudio" preload="auto" src="invitation-audio.mp3"></audio>
+    <button class="audio-fallback" id="audioFallback" type="button" aria-label="Включить аудио" title="Включить аудио">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"></path></svg>
+    </button>
     <div class="invitation-slides" aria-live="polite">
         <section class="invitation-slide is-active" aria-label="Биринчи слайд">
             <div class="invitation-panel">
@@ -1313,6 +1343,8 @@ body{
 <script>
 const invitationSlides = [...document.querySelectorAll('.invitation-slide')];
 const invitationAudio = document.getElementById('invitationAudio');
+const audioFallback = document.getElementById('audioFallback');
+const photoScene = document.querySelector('.photo-scene');
 const slideStartTimes = [0, 5.03, 8.48, 17.36, 24.27];
 const audioDurationFallback = 28.8;
 let currentSlide = 0;
@@ -1368,7 +1400,12 @@ function syncSilentSlideshow() {
 
 function markAudioStarted() {
     audioIsPlaying = true;
+    photoScene.classList.remove('audio-blocked');
     syncSlideToAudio();
+}
+
+function showAudioFallback() {
+    if (!audioIsPlaying) photoScene.classList.add('audio-blocked');
 }
 
 function attemptAudioStart() {
@@ -1385,7 +1422,7 @@ function attemptAudioStart() {
 
     const playRequest = invitationAudio.play();
     if (playRequest) {
-        playRequest.then(markAudioStarted).catch(() => {});
+        playRequest.then(markAudioStarted).catch(showAudioFallback);
     }
 }
 
@@ -1399,9 +1436,13 @@ invitationAudio.addEventListener('ended', () => {
         playRequest.then(markAudioStarted).catch(() => {
             audioIsPlaying = false;
             silentStartedAt = performance.now();
+            showAudioFallback();
         });
     }
 });
+
+invitationAudio.addEventListener('error', showAudioFallback);
+audioFallback.addEventListener('click', attemptAudioStart);
 
 window.setInterval(syncSilentSlideshow, 120);
 attemptAudioStart();
