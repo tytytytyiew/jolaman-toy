@@ -1046,46 +1046,6 @@ body{
     z-index:3;
 }
 
-.photo-scene:not(.is-playing) .invitation-slide{
-    display:none !important;
-    opacity:0;
-    visibility:hidden;
-}
-
-.audio-start{
-    position:absolute;
-    z-index:5;
-    left:max(16px,env(safe-area-inset-left));
-    bottom:max(16px,env(safe-area-inset-bottom));
-    display:grid;
-    width:44px;
-    height:44px;
-    padding:0;
-    place-items:center;
-    border:1px solid rgba(241,211,159,.55);
-    border-radius:50%;
-    background:rgba(28,42,34,.58);
-    color:#fff8e9;
-    box-shadow:0 4px 14px rgba(9,18,13,.2);
-    cursor:pointer;
-    transition:background .2s ease,transform .2s ease;
-}
-
-.audio-start svg{
-    width:17px;
-    height:17px;
-    fill:#f4d28f;
-}
-
-.audio-start:hover{
-    transform:scale(1.08);
-    background:rgba(28,42,34,.86);
-}
-
-.photo-scene.is-playing .audio-start{
-    display:none;
-}
-
 .invitation-audio{
     display:none;
 }
@@ -1294,10 +1254,6 @@ body{
     <div class="photo-scene__shade" aria-hidden="true"></div>
 
     <audio class="invitation-audio" id="invitationAudio" preload="auto" src="invitation-audio.mp3"></audio>
-    <button class="audio-start" id="audioStart" type="button" aria-label="Начать аудио и слайд-шоу" title="Начать аудио и слайд-шоу">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l11-6.5z"></path></svg>
-    </button>
-
     <div class="invitation-slides" aria-live="polite">
         <section class="invitation-slide is-active" aria-label="Биринчи слайд">
             <div class="invitation-panel">
@@ -1357,11 +1313,11 @@ body{
 <script>
 const invitationSlides = [...document.querySelectorAll('.invitation-slide')];
 const invitationAudio = document.getElementById('invitationAudio');
-const audioStart = document.getElementById('audioStart');
-const photoScene = document.querySelector('.photo-scene');
 const slideStartTimes = [0, 5.03, 8.48, 17.36, 24.27];
+const audioDurationFallback = 28.8;
 let currentSlide = 0;
-let isPlaying = false;
+let audioIsPlaying = false;
+let silentStartedAt = performance.now();
 
 function showInvitationSlide(index, seekAudio = false) {
     currentSlide = (index + invitationSlides.length) % invitationSlides.length;
@@ -1387,44 +1343,90 @@ function syncSlideToAudio() {
     if (nextSlide !== currentSlide) showInvitationSlide(nextSlide);
 }
 
+function syncSilentSlideshow() {
+    if (audioIsPlaying) {
+        syncSlideToAudio();
+        return;
+    }
+
+    const cycleDuration = Number.isFinite(invitationAudio.duration)
+        ? invitationAudio.duration
+        : audioDurationFallback;
+    const elapsed = ((performance.now() - silentStartedAt) / 1000) % cycleDuration;
+    let nextSlide = 0;
+
+    for (let index = 1; index < slideStartTimes.length; index += 1) {
+        if (elapsed >= slideStartTimes[index]) {
+            nextSlide = index;
+        } else {
+            break;
+        }
+    }
+
+    if (nextSlide !== currentSlide) showInvitationSlide(nextSlide);
+}
+
+function markAudioStarted() {
+    audioIsPlaying = true;
+    syncSlideToAudio();
+}
+
+function attemptAudioStart() {
+    if (audioIsPlaying) return;
+
+    const cycleDuration = Number.isFinite(invitationAudio.duration)
+        ? invitationAudio.duration
+        : audioDurationFallback;
+    const elapsed = ((performance.now() - silentStartedAt) / 1000) % cycleDuration;
+
+    if (invitationAudio.readyState >= 1) {
+        invitationAudio.currentTime = elapsed;
+    }
+
+    const playRequest = invitationAudio.play();
+    if (playRequest) {
+        playRequest.then(markAudioStarted).catch(() => {});
+    }
+}
+
+invitationAudio.addEventListener('playing', markAudioStarted);
 invitationAudio.addEventListener('timeupdate', syncSlideToAudio);
 invitationAudio.addEventListener('ended', () => {
     invitationAudio.currentTime = 0;
     showInvitationSlide(0);
-    invitationAudio.play();
-});
-
-audioStart.addEventListener('click', async () => {
-    try {
-        await invitationAudio.play();
-        isPlaying = true;
-        photoScene.classList.add('is-playing');
-        showInvitationSlide(0);
-    } catch (error) {
-        audioStart.textContent = 'Аудио ачылган жок';
+    const playRequest = invitationAudio.play();
+    if (playRequest) {
+        playRequest.then(markAudioStarted).catch(() => {
+            audioIsPlaying = false;
+            silentStartedAt = performance.now();
+        });
     }
 });
 
+window.setInterval(syncSilentSlideshow, 120);
+attemptAudioStart();
+document.addEventListener('pointerdown', attemptAudioStart, { once: true });
+
 document.addEventListener('keydown', event => {
-    if (!isPlaying) return;
     if (event.key === 'ArrowRight' || event.key === ' ') {
         event.preventDefault();
-        showInvitationSlide(currentSlide + 1, true);
+        attemptAudioStart();
+        showInvitationSlide(currentSlide + 1, audioIsPlaying);
     } else if (event.key === 'ArrowLeft') {
-        showInvitationSlide(currentSlide - 1, true);
+        attemptAudioStart();
+        showInvitationSlide(currentSlide - 1, audioIsPlaying);
     }
 });
 
 let touchStartX = 0;
 document.addEventListener('touchstart', event => {
-    if (!isPlaying) return;
     touchStartX = event.changedTouches[0].clientX;
 }, { passive: true });
 document.addEventListener('touchend', event => {
-    if (!isPlaying) return;
     const swipeDistance = event.changedTouches[0].clientX - touchStartX;
     if (Math.abs(swipeDistance) > 50) {
-        showInvitationSlide(currentSlide + (swipeDistance < 0 ? 1 : -1), true);
+        attemptAudioStart();
+        showInvitationSlide(currentSlide + (swipeDistance < 0 ? 1 : -1), audioIsPlaying);
     }
 }, { passive: true });
 </script>
