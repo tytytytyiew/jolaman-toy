@@ -23,6 +23,57 @@ html, body {
     color: #fff8e9;
 }
 
+/* Стартовый оверлей */
+.start-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 999;
+    background: rgba(15, 27, 22, 0.92);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.start-overlay.is-hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+/* Круглая кнопка по центру без текста */
+.start-btn {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #f4d28f, #e1b463);
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(244, 210, 143, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    padding: 0;
+}
+
+.start-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 12px 35px rgba(0,0,0,0.6), 0 0 30px rgba(244, 210, 143, 0.6);
+}
+
+.start-btn:active {
+    transform: scale(0.95);
+}
+
+.start-btn svg {
+    width: 32px;
+    height: 32px;
+    fill: #1c2a22;
+    margin-left: 4px;
+}
+
 .photo-scene {
     position: relative;
     width: 100vw;
@@ -36,7 +87,7 @@ html, body {
     position: absolute;
     inset: -24px;
     z-index: 0;
-    background-image: url('Снимок экрана 2026-10-03 211608.png');
+    background-image: url('Снимок%20экрана%2003.10.2026%20211608.png');
     background-position: center;
     background-size: cover;
     filter: blur(22px) brightness(.58) saturate(1.1);
@@ -47,7 +98,7 @@ html, body {
     position: absolute;
     inset: 0;
     z-index: 1;
-    background-image: url('Снимок экрана 2026-10-03 211608.png');
+    background-image: url('Снимок%20экрана%2003.10.2026%20211608.png');
     background-position: center;
     background-size: contain;
     background-repeat: no-repeat;
@@ -100,8 +151,6 @@ html, body {
     box-shadow: 0 24px 70px rgba(9, 18, 13, .3);
     backdrop-filter: blur(8px);
     text-align: center;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(241, 211, 159, .55) transparent;
 }
 
 .invitation-slide.is-active .invitation-panel {
@@ -229,18 +278,18 @@ html, body {
         font-size: clamp(20px, 5.5vw, 26px);
     }
 }
-
-@media(prefers-reduced-motion: reduce){
-    .photo-scene__image,
-    .invitation-slide.is-active .invitation-panel,
-    .invitation-slide.is-active .stagger {
-        animation-duration: .01ms !important;
-    }
-}
 </style>
 </head>
 
 <body>
+
+<div class="start-overlay" id="startOverlay">
+    <button class="start-btn" id="startBtn" aria-label="Воспроизвести">
+        <svg viewBox="0 0 24 24">
+            <path d="M8 5v14l11-7z"/>
+        </svg>
+    </button>
+</div>
 
 <main class="photo-scene">
     <div class="photo-scene__ambient" aria-hidden="true"></div>
@@ -249,8 +298,8 @@ html, body {
 
     <audio class="invitation-audio" id="invitationAudio" preload="auto" src="invitation-audio.mp3"></audio>
 
-    <div class="invitation-slides" aria-live="polite">
-        <section class="invitation-slide is-active" aria-label="Биринчи слайд">
+    <div class="invitation-slides">
+        <section class="invitation-slide is-active">
             <div class="invitation-panel">
                 <p class="invitation-copy">
                     <span class="stagger" style="--delay:.15s">Жаңы бүтүп үйүбүз,</span>
@@ -259,7 +308,7 @@ html, body {
             </div>
         </section>
 
-        <section class="invitation-slide" aria-label="Экинчи слайд">
+        <section class="invitation-slide">
             <div class="invitation-panel">
                 <p class="invitation-copy">
                     <span class="stagger" style="--delay:.18s">Той өткөрүп жатабыз,</span>
@@ -268,7 +317,7 @@ html, body {
             </div>
         </section>
 
-        <section class="invitation-slide" aria-label="Үчүнчү слайд">
+        <section class="invitation-slide">
             <div class="invitation-panel">
                 <p class="invitation-copy">
                     <span class="stagger stagger--accent" style="--delay:.15s">Урматтуу коноктор!</span>
@@ -281,7 +330,7 @@ html, body {
             </div>
         </section>
 
-        <section class="invitation-slide" aria-label="Төртүнчү слайд">
+        <section class="invitation-slide">
             <div class="invitation-panel">
                 <div class="invitation-copy invitation-copy--details">
                     <div class="stagger stagger--accent" style="--delay:.15s">Дареги:</div>
@@ -293,7 +342,7 @@ html, body {
             </div>
         </section>
 
-        <section class="invitation-slide" aria-label="Бешинчи слайд">
+        <section class="invitation-slide">
             <div class="invitation-panel">
                 <p class="invitation-copy">
                     <span class="stagger" style="--delay:.15s">Сиздерди терең урматтоо менен,</span>
@@ -308,123 +357,48 @@ html, body {
 <script>
 const invitationSlides = [...document.querySelectorAll('.invitation-slide')];
 const invitationAudio = document.getElementById('invitationAudio');
+const startOverlay = document.getElementById('startOverlay');
+const startBtn = document.getElementById('startBtn');
+
 const slideStartTimes = [0, 5.03, 8.48, 17.36, 24.27];
-const audioDurationFallback = 28.8;
 let currentSlide = 0;
-let audioIsPlaying = false;
-let silentStartedAt = performance.now();
 
-function showInvitationSlide(index, seekAudio = false) {
+function showSlide(index) {
     currentSlide = (index + invitationSlides.length) % invitationSlides.length;
-    invitationSlides.forEach((slide, slideIndex) => {
-        slide.classList.toggle('is-active', slideIndex === currentSlide);
+    invitationSlides.forEach((slide, i) => {
+        slide.classList.toggle('is-active', i === currentSlide);
     });
-
-    if (seekAudio && Number.isFinite(invitationAudio.duration)) {
-        invitationAudio.currentTime = slideStartTimes[currentSlide];
-    }
 }
 
-function syncSlideToAudio() {
-    if (!Number.isFinite(invitationAudio.duration) || invitationAudio.duration <= 0) return;
+function syncAudio() {
+    if (!invitationAudio.duration) return;
     let nextSlide = 0;
-    for (let index = 1; index < slideStartTimes.length; index += 1) {
-        if (invitationAudio.currentTime >= slideStartTimes[index]) {
-            nextSlide = index;
+    for (let i = 1; i < slideStartTimes.length; i++) {
+        if (invitationAudio.currentTime >= slideStartTimes[i]) {
+            nextSlide = i;
         } else {
             break;
         }
     }
-    if (nextSlide !== currentSlide) showInvitationSlide(nextSlide);
-}
-
-function syncSilentSlideshow() {
-    if (audioIsPlaying) {
-        syncSlideToAudio();
-        return;
-    }
-
-    const cycleDuration = Number.isFinite(invitationAudio.duration)
-        ? invitationAudio.duration
-        : audioDurationFallback;
-    const elapsed = ((performance.now() - silentStartedAt) / 1000) % cycleDuration;
-    let nextSlide = 0;
-
-    for (let index = 1; index < slideStartTimes.length; index += 1) {
-        if (elapsed >= slideStartTimes[index]) {
-            nextSlide = index;
-        } else {
-            break;
-        }
-    }
-
-    if (nextSlide !== currentSlide) showInvitationSlide(nextSlide);
-}
-
-function markAudioStarted() {
-    audioIsPlaying = true;
-    syncSlideToAudio();
-}
-
-function attemptAudioStart() {
-    if (audioIsPlaying) return;
-
-    const cycleDuration = Number.isFinite(invitationAudio.duration)
-        ? invitationAudio.duration
-        : audioDurationFallback;
-    const elapsed = ((performance.now() - silentStartedAt) / 1000) % cycleDuration;
-
-    if (invitationAudio.readyState >= 1) {
-        invitationAudio.currentTime = elapsed;
-    }
-
-    const playRequest = invitationAudio.play();
-    if (playRequest) {
-        playRequest.then(markAudioStarted).catch(() => {});
+    if (nextSlide !== currentSlide) {
+        showSlide(nextSlide);
     }
 }
 
-invitationAudio.addEventListener('playing', markAudioStarted);
-invitationAudio.addEventListener('timeupdate', syncSlideToAudio);
+startBtn.addEventListener('click', () => {
+    startOverlay.classList.add('is-hidden');
+    invitationAudio.play().then(() => {
+        invitationAudio.addEventListener('timeupdate', syncAudio);
+    }).catch(err => {
+        console.error("Ошибка воспроизведения аудио:", err);
+    });
+});
+
 invitationAudio.addEventListener('ended', () => {
     invitationAudio.currentTime = 0;
-    showInvitationSlide(0);
-    const playRequest = invitationAudio.play();
-    if (playRequest) {
-        playRequest.then(markAudioStarted).catch(() => {
-            audioIsPlaying = false;
-            silentStartedAt = performance.now();
-        });
-    }
+    showSlide(0);
+    invitationAudio.play();
 });
-
-window.setInterval(syncSilentSlideshow, 120);
-
-document.addEventListener('pointerdown', attemptAudioStart, { once: true });
-
-document.addEventListener('keydown', event => {
-    if (event.key === 'ArrowRight' || event.key === ' ') {
-        event.preventDefault();
-        attemptAudioStart();
-        showInvitationSlide(currentSlide + 1, audioIsPlaying);
-    } else if (event.key === 'ArrowLeft') {
-        attemptAudioStart();
-        showInvitationSlide(currentSlide - 1, audioIsPlaying);
-    }
-});
-
-let touchStartX = 0;
-document.addEventListener('touchstart', event => {
-    touchStartX = event.changedTouches[0].clientX;
-}, { passive: true });
-
-document.addEventListener('touchend', event => {
-    const swipeDistance = event.changedTouches[0].clientX - touchStartX;
-    if (Math.abs(swipeDistance) > 50) {
-        attemptAudioStart();
-        showInvitationSlide(currentSlide + (swipeDistance < 0 ? 1 : -1), audioIsPlaying);
-    }
-}, { passive: true });
 </script>
 
 </body>
