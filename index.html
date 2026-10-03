@@ -137,7 +137,7 @@ html, body {
     padding: clamp(26px, 4vw, 54px);
     border: 1px solid rgba(241, 211, 159, .44);
     border-radius: 14px;
-    background: rgba(28, 42, 34, .93);
+    background: rgba(28, 42, 34, .91);
     box-shadow: 0 24px 70px rgba(9, 18, 13, .3);
     backdrop-filter: blur(8px);
     text-align: center;
@@ -199,9 +199,10 @@ html, body {
     to { opacity: 1; transform: translateY(0); }
 }
 
+/* Адаптация под телефоны */
 @media(max-width: 700px){
     .photo-scene__image {
-        background-position: center top;
+        background-position: center 20%;
         background-size: cover;
     }
 
@@ -213,13 +214,13 @@ html, body {
 
     .invitation-panel {
         width: 100%;
-        max-height: 65vh;
+        max-height: 52vh;
         border-radius: 0;
-        background: linear-gradient(180deg, rgba(28,42,34,0), rgba(28,42,34,.95) 20%);
+        background: linear-gradient(180deg, rgba(28,42,34,0) 0%, rgba(28,42,34,0.85) 25%, rgba(28,42,34,0.98) 100%);
         box-shadow: none;
         backdrop-filter: none;
         border: none;
-        padding: 30px 20px 30px;
+        padding: 40px 20px 25px;
     }
 
     .invitation-copy {
@@ -346,7 +347,6 @@ startBtn.addEventListener('click', () => {
     invitationAudio.play().then(() => {
         invitationAudio.addEventListener('timeupdate', syncAudio);
     }).catch(err => {
-        alert("Ошибка аудиофайла. Проверьте, загружен ли invitation-audio.mp3 на GitHub.");
         console.error(err);
     });
 });
